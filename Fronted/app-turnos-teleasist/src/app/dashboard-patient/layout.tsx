@@ -15,21 +15,26 @@ const DashboardPatient = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   const { idUser, idPatient, email, username, hasHydrated } = useUserStore();
+
   const { data: notifications = [] } = useGetNotificationsByIdPatient(idPatient);
 
-
   useEffect(() => {
-    if (!hasHydrated) return; 
+    if (!hasHydrated) return;
 
     if (!idUser) {
-      router.push("/login");
+      router.replace("/login");
       return;
     }
 
     if (idUser && !idPatient) {
-      router.push("/profile-patient");
+      router.replace("/profile-patient");
     }
   }, [idUser, idPatient, hasHydrated, router]);
+
+  useEffect(() => {
+    const notReaded = notifications.filter((n) => n.read === false);
+    setQuantityNotifications(notReaded.length);
+  }, [notifications]);
 
   if (!hasHydrated || !idUser) {
     return (
@@ -38,13 +43,6 @@ const DashboardPatient = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-
-  useEffect(() => {
-    const notReaded = notifications.filter(
-      (notification) => notification.read === false
-    );
-    setQuantityNotifications(notReaded.length);
-  }, [notifications]);
 
   return (
     <div className="min-h-screen flex flex-col lg:grid lg:grid-cols-[280px_1fr] bg-gray-50">
@@ -64,28 +62,17 @@ const DashboardPatient = ({ children }: { children: React.ReactNode }) => {
         <header className="w-full h-[10vh] flex items-center p-4 dashboardHeader-bg-gradient lg:border-b">
           <div className="flex justify-between items-center w-full">
             <div className="lg:hidden">
-              <img
-                src="/logo-blanco.svg"
-                alt="logo app"
-                className="h-10 ml-2"
-              />
+              <img src="/logo-blanco.svg" alt="logo app" className="h-10 ml-2" />
             </div>
 
             <div className="flex gap-2 items-center justify-end w-full">
               <IoIosNotificationsOutline className="h-auto w-7 text-white lg:text-gray-900" />
 
               <div className="flex justify-around">
-                <img
-                  className="rounded-full h-auto w-8"
-                  src="/profile_1.jpg"
-                  alt="imagen perfil"
-                />
+                <img className="rounded-full h-auto w-8" src="/profile_1.jpg" alt="imagen perfil" />
               </div>
 
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="lg:hidden text-gray-800"
-              >
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden text-gray-800">
                 <GiHamburgerMenu className="w-6 h-6 text-white" />
               </button>
 
@@ -98,9 +85,7 @@ const DashboardPatient = ({ children }: { children: React.ReactNode }) => {
         </header>
 
         <section className="grow w-full p-3 md:p-6">
-          <div className="bg-white rounded-lg shadow p-4 md:p-6 h-full">
-            {children}
-          </div>
+          <div className="bg-white rounded-lg shadow p-4 md:p-6 h-full">{children}</div>
         </section>
       </main>
     </div>
